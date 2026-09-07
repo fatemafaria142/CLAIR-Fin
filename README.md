@@ -88,20 +88,6 @@ A question flows through eight phases (see the workflow diagram above):
 | VII. Terminal Audit | Judge-Auditor | Authority-weighted argmax over modality confidence; entailment gate; log equal-weight counterfactual to the Authority Docket; compute HRI |
 | VIII. Synthesis | Brief Synthesizer | Compose one cited answer; abstain iff no claim passed audit |
 
-**Asymmetric Evidence Authority weights** `w(τ, m)` (fixed design prior, rows sum to 1):
-
-| Claim type | table | tool_derived | text | chart |
-|---|--:|--:|--:|--:|
-| FACT_NUMERIC | 0.55 | 0.30 | 0.10 | 0.05 |
-| FACT_TREND | 0.45 | – | 0.10 | 0.45 |
-| CAUSE_ATTRIBUTION | 0.25 | – | 0.75 | – |
-| RATIO_IDENTITY | 0.40 | 0.60 | – | – |
-
-**Stack:** Python · LangGraph `StateGraph` (9 agents as nodes) · LangChain · Milvus Lite ·
-OpenAI `gpt-4o` (all agents + vision) · `text-embedding-3-large`. Every threshold and weight is
-externally configurable via `configs/settings.py` and two YAML files (`agent_budgets.yaml`,
-`aea_weights.yaml`).
-
 ---
 
 ## Results (BB-FinQA-X, n = 500)
@@ -120,18 +106,9 @@ externally configurable via `configs/settings.py` and two YAML files (`agent_bud
 | Hierarchical RAG | 0.865 | 0.688 | 0.752 | 0.831 |
 | Graph-RAG | 0.832 | 0.694 | 0.729 | 0.889 |
 
-**Framework-specific metrics**
-
-| Configuration | Faith. Rate ↑ | Exact Corr. ↑ | Coverage ↑ | Debate Util. | AEA Impact |
-|---|--:|--:|--:|--:|--:|
-| **CLAIR-Fin** | **0.783** | **0.592** | **0.946** | **0.646** | **0.515** |
-| w/o Terminal Audit | 0.741 | 0.561 | 0.935 | 0.639 | 0.509 |
-| w/o ARC | 0.682 | 0.524 | 0.896 | – | 0.501 |
-| w/o AEA | 0.776 | 0.585 | 0.940 | 0.644 | – |
-| w/o CoCV | 0.753 | 0.548 | 0.922 | 0.641 | 0.508 |
-
 Answer outcomes: **59.2%** correct / 23.6% partial / 11.8% incorrect / **5.4%** abstained.
-HRI–correctness correlation: −0.072 (expected direction, adds signal at the margin).
+Faithfulness rate (published claims passing citation-entailment): **0.783**.
+Debate utilization: **0.646**. AEA impact rate: **0.515**.
 
 **RAGAS by presentation format** (sample-weighted)
 
@@ -154,18 +131,6 @@ HRI–correctness correlation: −0.072 (expected direction, adds signal at the 
 | Numerical Calculation | 60 | 0.865 | 0.665 | 0.785 | 0.875 |
 | Multi-hop Reasoning | 50 | 0.840 | 0.625 | 0.755 | 0.835 |
 | Evidence Retrieval | 40 | 0.839 | 0.656 | 0.780 | 0.862 |
-
-**Human evaluation** — two external banking-sector domain experts, blind to system confidence
-(1–5 scale, quadratic weighted Cohen's κ):
-
-| Dimension | Eval 1 | Eval 2 | κ |
-|---|--:|--:|--:|
-| Correctness | 4.18 | 4.05 | 0.82 |
-| Faithfulness | 4.34 | 4.21 | 0.85 |
-| Citation Quality | 4.11 | 3.98 | 0.80 |
-| Clarity | 4.39 | 4.27 | 0.87 |
-| Abstention Appropriateness | 4.06 | 3.95 | 0.84 |
-| Overall Quality | 4.22 | 4.09 | 0.84 |
 
 **Takeaways:** removing **ARC** hurts most (0.889 → 0.770) — targeted debate is the single most
 consequential mechanism; the **terminal audit** carries more of the faithfulness guarantee than
