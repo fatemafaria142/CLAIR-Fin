@@ -196,14 +196,27 @@ uvicorn server.main:app --reload         # POST /api/query  {"question": "..."}
 
 ### 6. (Optional) Reproduce the evaluation
 
-Gold questions live in `evaluation/questions/chapter_*.json` (regenerate from
-`docs/questions.md` with `python -m evaluation.gold_data`). For a chapter:
+Gold questions are pulled straight from the Hugging Face Hub
+([`Fatema142/BB-FinQA-X`](https://huggingface.co/datasets/Fatema142/BB-FinQA-X), 500 rows) with
+the `--hf` flag — no local question files needed.
+
+**Whole dataset (all 500 questions):**
 
 ```bash
-python -m evaluation.generate_responses --chapter 3        # run pipeline, save responses + contexts
-python -m evaluation.run_rag_metrics --chapter 3           # Table 1: RAGAS + ranking metrics
-python -m evaluation.run_clairfin_metrics --chapter 3      # Table 2: faithfulness rate, coverage, AEA impact
+python -m evaluation.generate_responses --hf                     # → evaluation/evaluated_output/bbfinqax.json
+python -m evaluation.run_rag_metrics --name bbfinqax             # Table 1: RAGAS + ranking metrics
+python -m evaluation.run_clairfin_metrics --name bbfinqax        # Table 2: faithfulness rate, coverage, AEA impact
 ```
+
+**Chapter-wise (one of chapters 1–9):**
+
+```bash
+python -m evaluation.generate_responses --hf --chapter 3         # → evaluation/evaluated_output/chapter_3.json
+python -m evaluation.run_rag_metrics --chapter 3
+python -m evaluation.run_clairfin_metrics --chapter 3
+```
+
+Add `--all` to `generate_responses --hf` to write one output file per chapter in a single run.
 
 Retrieval-strategy baselines (HyDE, Hierarchical, Graph-RAG) live under `ablation-study/`, each
 with its own `run_and_score.py --chapters 1 2 3`.
