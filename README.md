@@ -1,15 +1,30 @@
 # CLAIR-Fin: An Adversarial Multi-Agent Framework for Claim-Level Verification and Adaptive Debate in Cross-Modal Financial QA
 
-CLAIR-Fin is a nine-agent framework for faithful question answering over long, multimodal
-financial documents, where the same fact may appear as prose, a table, and a chart that do not
-always agree. Each question is decomposed into atomic, typed **claims** held in a *Financial
-Claim Ledger*; every claim is resolved through modality-aware evidence weighting, hand-off
-grounding checks, adaptive adversarial debate, and a terminal entailment audit, and the framework
-abstains when evidence is insufficient rather than forcing an unsupported answer.
+Faithful question answering over long financial documents means reconciling evidence across
+prose, tables, and charts that do not always agree. Prior work handles this only in pieces:
+retrieved evidence is trusted regardless of which modality it came from, adversarial debate
+verifies a whole report instead of its individual claims, and grounding is checked only after
+the answer is drafted. **CLAIR-Fin** is a nine-agent framework that closes these gaps with four
+contributions:
 
-On **BB-FinQA-X** (500 cross-modal questions from the Bangladesh Bank Annual Report), CLAIR-Fin
-raises faithfulness from **0.780 → 0.889** over a single-pass RAG baseline and outperforms
-stronger retrieval baselines such as HyDE and Graph-RAG, while abstaining on 5.4% of questions.
+- **Financial Claim Ledger** — every question is decomposed into atomic, typed claims held in a
+  typed evidence graph that serves as the single verification, audit, and citation artifact.
+- **Asymmetric Evidence Authority (AEA)** — evidence trust is conditioned on claim type (table
+  cells for exact figures, prose for causal attribution) instead of treating all modalities
+  equally, so cross-modal disagreement is resolved by a stated, auditable prior.
+- **Chain-of-Custody Verification (CoCV)** — grounding is checked at the hand-off between
+  drafting and adversarial review, not only at the pipeline's exit, stopping attribution drift
+  before it propagates.
+- **Adaptive Rebuttal Cycle (ARC)** + **Hallucination Risk Index (HRI)** — adversarial debate is
+  routed only to contested claims with depth scaled to what it finds, and a terminal entailment
+  audit is paired with a continuous per-claim risk score that separates claims that survived
+  scrutiny from those never challenged.
+
+To evaluate it we release **BB-FinQA-X**, a 500-question cross-modal financial QA set built from
+the Bangladesh Bank Annual Report and stratified by query type, presentation format, and
+difficulty. CLAIR-Fin raises faithfulness from **0.780 → 0.889** over a single-pass RAG baseline,
+beats stronger retrieval baselines such as HyDE and Graph-RAG, and abstains on 5.4% of questions
+rather than forcing an unsupported answer.
 
 - 📄 Paper: https://arxiv.org/abs/2608.13706
 - 🤗 Dataset: https://huggingface.co/datasets/Fatema142/BB-FinQA-X
