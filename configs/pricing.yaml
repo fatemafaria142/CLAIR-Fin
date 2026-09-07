@@ -1,0 +1,11 @@
+# Per-1M-token USD pricing per model, used by the cost tracker to estimate run cost.
+gpt-4o-mini:
+  input: 0.15
+  output: 0.60
+
+gpt-4o:
+  input: 2.50
+  output: 10.00
+
+text-embedding-3-large:
+  input: 0.13
