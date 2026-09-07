@@ -1,7 +1,5 @@
 # CLAIR-Fin: An Adversarial Multi-Agent Framework for Claim-Level Verification and Adaptive Debate in Cross-Modal Financial QA
 
-**CLAIR-Fin** — Claim-Ledger Adversarial Inference and Retrieval for Financial document understanding.
-
 CLAIR-Fin is a nine-agent framework for faithful question answering over long, multimodal
 financial documents, where the same fact may appear as prose, a table, and a chart that do not
 always agree. Each question is decomposed into atomic, typed **claims** held in a *Financial
@@ -161,7 +159,7 @@ pip install -r requirements.txt          # or: uv sync
 
 Create a `.env` file in the project root:
 
-```env
+```ini
 OPENAI_API_KEY=sk-...                    # required
 OPENAI_MODEL=gpt-4o                      # chat backbone for all agents
 OPENAI_VISION_MODEL=gpt-4o               # page table/chart extraction
