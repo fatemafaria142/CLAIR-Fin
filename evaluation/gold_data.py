@@ -11,6 +11,9 @@ _CHAPTER_HEADING = re.compile(r"^# (Chapter \d+) – (.+?) \(\d+ Questions\)$")
 QUESTIONS_DIR = Path(__file__).parent / "questions"
 
 
+HF_DATASET_ID = "Fatema142/BB-FinQA-X"
+
+
 @dataclass
 class GoldQuestion:
     id: str
@@ -20,10 +23,10 @@ class GoldQuestion:
     question: str
     answer: str
     query_type: str
-    reasoning_skill: str
     presentation_format: str
     difficulty: str
     source_page: str
+    reasoning_skill: str = ""
     evidence: str | None = None
 
 
@@ -106,6 +109,56 @@ def load_chapter_questions(chapter: int | str, questions_dir: Path = QUESTIONS_D
             f"{path} doesn't exist — run `python -m evaluation.gold_data` first to generate it from docs/questions.md"
         )
     return [GoldQuestion(**row) for row in json.loads(path.read_text(encoding="utf-8"))]
+
+
+def _chapter_number(value: str) -> str | None:
+    """Pull the chapter number out of an id ("chapter_3-q7" -> "3") or a chapter label
+    ("Chapter 3: Price and Inflation" -> "3")."""
+    m = re.search(r"chapter[_ ](\d+)", value, flags=re.IGNORECASE)
+    return m.group(1) if m else None
+
+
+def load_hf_questions(chapter: int | str | None = None) -> list[GoldQuestion]:
+    """Load the gold questions straight from the Hugging Face Hub (`Fatema142/BB-FinQA-X`,
+    `train` split, 500 rows). Pass `chapter` (1-9) to keep only that chapter, or leave it `None`
+    for the whole dataset. Requires the `datasets` package (already a project dependency)."""
+    from datasets import load_dataset
+
+    rows = load_dataset(HF_DATASET_ID, split="train")
+    want = str(chapter) if chapter is not None else None
+
+    questions: list[GoldQuestion] = []
+    for row in rows:
+        num = _chapter_number(str(row.get("id", ""))) or _chapter_number(str(row.get("chapter", "")))
+        if want is not None and num != want:
+            continue
+        chapter_label = str(row.get("chapter", "") or (f"Chapter {num}" if num else ""))
+        chapter_title = str(row.get("chapter_title") or "")
+        if not chapter_title and ":" in chapter_label:
+            chapter_label, chapter_title = (p.strip() for p in chapter_label.split(":", 1))
+        questions.append(
+            GoldQuestion(
+                id=str(row["id"]),
+                number=int(row.get("number") or len(questions) + 1),
+                chapter=chapter_label.split(":", 1)[0].strip(),
+                chapter_title=chapter_title,
+                question=str(row["question"]),
+                answer=_strip_markdown_bold(str(row["answer"])),
+                query_type=str(row.get("query_type", "")),
+                reasoning_skill=str(row.get("reasoning_skill", "")),
+                presentation_format=str(row.get("presentation_format", "")),
+                difficulty=str(row.get("difficulty", "")),
+                source_page=str(row.get("source_page", "")),
+                evidence=(str(row["evidence"]) if row.get("evidence") else None),
+            )
+        )
+    return questions
+
+
+def hf_chapters() -> list[str]:
+    """Chapter numbers present in the Hugging Face dataset, sorted."""
+    seen = {_chapter_number(q.id) for q in load_hf_questions()}
+    return sorted((n for n in seen if n), key=int)
 
 
 def list_available_chapters(questions_dir: Path = QUESTIONS_DIR) -> list[str]:
