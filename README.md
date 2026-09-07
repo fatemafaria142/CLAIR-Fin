@@ -1,6 +1,6 @@
-# CLAIR-Fin
+# CLAIR-Fin: An Adversarial Multi-Agent Framework for Claim-Level Verification and Adaptive Debate in Cross-Modal Financial QA
 
-**Claim-Ledger Adversarial Inference and Retrieval for Financial document understanding**
+**CLAIR-Fin** — Claim-Ledger Adversarial Inference and Retrieval for Financial document understanding.
 
 CLAIR-Fin is a nine-agent framework for faithful question answering over long, multimodal
 financial documents, where the same fact may appear as prose, a table, and a chart that do not
