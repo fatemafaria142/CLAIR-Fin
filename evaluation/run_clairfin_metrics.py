@@ -16,7 +16,7 @@ RESULTS_DIR = Path(__file__).parent / "results"
 
 
 def load_chapter_responses(chapter: str) -> list[dict]:
-    slug = chapter if str(chapter).startswith("chapter_") else f"chapter_{chapter}"
+    slug = f"chapter_{chapter}" if str(chapter).isdigit() else str(chapter)
     path = EVALUATED_OUTPUT_DIR / f"{slug}.json"
     if not path.exists():
         raise FileNotFoundError(f"{path} doesn't exist — run `python -m evaluation.generate_responses --chapter {chapter}` first")
@@ -222,12 +222,18 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Score CLAIR-Fin-Specific Metrics from evaluation/evaluated_output/")
     parser.add_argument("--chapter", type=int, default=None, help="Chapter number (1, 2, 3, ...)")
     parser.add_argument("--all", action="store_true", help="Score every chapter with a evaluated_output/chapter_N.json file")
+    parser.add_argument("--name", default=None, help="Score evaluated_output/<name>.json directly (e.g. --name bbfinqax for the whole dataset)")
     args = parser.parse_args()
 
-    if not args.all and args.chapter is None:
-        parser.error("pass --chapter N or --all")
+    if not args.all and args.chapter is None and args.name is None:
+        parser.error("pass --chapter N, --all, or --name STEM")
 
-    chapters = list_available_chapters() if args.all else [str(args.chapter)]
+    if args.name is not None:
+        chapters = [str(args.name)]
+    elif args.all:
+        chapters = list_available_chapters()
+    else:
+        chapters = [str(args.chapter)]
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
     all_aggregates = []
@@ -245,7 +251,7 @@ def main() -> None:
 
         aggregate = aggregate_results(chapter_label, scored_rows)
         all_aggregates.append(aggregate)
-        slug = f"chapter_{chapter}" if not str(chapter).startswith("chapter_") else chapter
+        slug = f"chapter_{chapter}" if str(chapter).isdigit() else str(chapter)
 
         (RESULTS_DIR / f"{slug}_clairfin_metrics.json").write_text(
             json.dumps({"aggregate": aggregate, "per_question": scored_rows}, indent=2), encoding="utf-8"
