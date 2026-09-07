@@ -36,6 +36,11 @@ banking-sector domain validation → mandatory consensus). Each item records its
 (text passage / table cell / chart element) and source page, and is stratified along three
 controlled dimensions.
 
+![BB-FinQA-X dataset examples](diagrams/CLAIR-Fin_Dataset.png)
+
+Three items from the Price and Inflation chapter — grounded in a table, a chart + text, and text
+alone — with the source excerpt and the recorded annotation fields.
+
 **By query type × difficulty**
 
 | Query Type | Easy | Medium | Hard | Total |
