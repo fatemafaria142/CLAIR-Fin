@@ -5,20 +5,15 @@ prose, tables, and charts that do not always agree. Prior work handles this only
 retrieved evidence is trusted regardless of which modality it came from, adversarial debate
 verifies a whole report instead of its individual claims, and grounding is checked only after
 the answer is drafted. **CLAIR-Fin** is a nine-agent framework that closes these gaps with four
-contributions:
+mechanisms built around a typed claim ledger:
 
-- **Financial Claim Ledger** — every question is decomposed into atomic, typed claims held in a
-  typed evidence graph that serves as the single verification, audit, and citation artifact.
-- **Asymmetric Evidence Authority (AEA)** — evidence trust is conditioned on claim type (table
-  cells for exact figures, prose for causal attribution) instead of treating all modalities
-  equally, so cross-modal disagreement is resolved by a stated, auditable prior.
-- **Chain-of-Custody Verification (CoCV)** — grounding is checked at the hand-off between
-  drafting and adversarial review, not only at the pipeline's exit, stopping attribution drift
-  before it propagates.
-- **Adaptive Rebuttal Cycle (ARC)** + **Hallucination Risk Index (HRI)** — adversarial debate is
-  routed only to contested claims with depth scaled to what it finds, and a terminal entailment
-  audit is paired with a continuous per-claim risk score that separates claims that survived
-  scrutiny from those never challenged.
+| Mechanism | What it does | Why it matters |
+|---|---|---|
+| **Financial Claim Ledger** | Decomposes every question into atomic, typed claims held in a typed evidence graph | One artifact serves as the single verification, audit, and citation record |
+| **AEA** – Asymmetric Evidence Authority | Conditions evidence trust on claim type (table cells for exact figures, prose for causal attribution) instead of treating all modalities equally | Resolves cross-modal disagreement by a stated, auditable prior |
+| **CoCV** – Chain-of-Custody Verification | Checks grounding at the hand-off between drafting and adversarial review, not only at the pipeline's exit | Stops attribution drift before it propagates |
+| **ARC** – Adaptive Rebuttal Cycle | Routes only contested claims (coverage `< 0.75`) to adversarial debate; depth scales with what the debate finds (max 2 rounds) | Spends compute on the claims most likely to be wrong |
+| **HRI** – Hallucination Risk Index | Continuous per-claim risk score paired with the binary terminal-audit verdict | Distinguishes claims that survived scrutiny from claims never contested |
 
 To evaluate it we release **BB-FinQA-X**, a 500-question cross-modal financial QA set built from
 the Bangladesh Bank Annual Report and stratified by query type, presentation format, and
@@ -30,19 +25,6 @@ rather than forcing an unsupported answer.
 - 🤗 Dataset: https://huggingface.co/datasets/Fatema142/BB-FinQA-X
 
 ![CLAIR-Fin workflow](diagrams/CLAIR-Fin_Workflow.png)
-
----
-
-## Core idea
-
-Prior work addresses one piece of the problem in isolation; CLAIR-Fin combines four mechanisms:
-
-| Mechanism | What it does | Why it matters |
-|---|---|---|
-| **AEA** – Asymmetric Evidence Authority | Conditions evidence trust on claim type (table cells for exact figures, prose for causal attribution) instead of treating all modalities equally | Resolves cross-modal disagreement by a stated, auditable prior |
-| **CoCV** – Chain-of-Custody Verification | Checks grounding at the hand-off between drafting and adversarial review, not only at the pipeline's exit | Stops attribution drift before it propagates |
-| **ARC** – Adaptive Rebuttal Cycle | Routes only contested claims (coverage `< 0.75`) to adversarial debate; depth scales with what the debate finds (max 2 rounds) | Spends compute on the claims most likely to be wrong |
-| **HRI** – Hallucination Risk Index | Continuous per-claim risk score paired with the binary audit verdict | Distinguishes claims that survived scrutiny from claims never contested |
 
 ---
 
