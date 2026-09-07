@@ -69,8 +69,6 @@ Text Only / Table Only and Chart Only / Text + Chart are **matched content pairs
 indicator, query type, and difficulty; different evidence format), enabling controlled format
 comparisons.
 
-![BB-FinQA-X qualitative examples](diagrams/CLAIR-Fin_Example.png)
-
 ---
 
 ## Methodology
@@ -91,6 +89,13 @@ A question flows through eight phases (see the workflow diagram above):
 ---
 
 ## Results (BB-FinQA-X, n = 500)
+
+Qualitative examples — retrieved contexts, CLAIR-Fin's generated response, and the gold answer,
+with cited figures highlighted. In the third case the chart's approximate readings (4.5% / 4.0%)
+diverge from the exact table figures (4.22% / 3.97%); the response follows the table and text
+rather than the chart, as prescribed by Asymmetric Evidence Authority.
+
+![CLAIR-Fin qualitative results](diagrams/CLAIR-Fin_Example.png)
 
 **RAGAS metrics — CLAIR-Fin vs. ablations and retrieval baselines**
 
