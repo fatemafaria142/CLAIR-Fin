@@ -1,0 +1,20 @@
+# Per-claim-type evidence-source weights used by the Authority-Evidence Alignment (AEA) scorer.
+claim_types:
+  FACT_NUMERIC:
+    table: 0.55
+    tool_derived: 0.30
+    text: 0.10
+    chart: 0.05
+
+  FACT_TREND:
+    chart: 0.45
+    table: 0.45
+    text: 0.10
+
+  CAUSE_ATTRIBUTION:
+    text: 0.75
+    table: 0.25
+
+  RATIO_IDENTITY:
+    tool_derived: 0.60
+    table: 0.40
