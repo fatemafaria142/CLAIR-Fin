@@ -13,7 +13,7 @@ On **BB-FinQA-X** (500 cross-modal questions from the Bangladesh Bank Annual Rep
 raises faithfulness from **0.780 → 0.889** over a single-pass RAG baseline and outperforms
 stronger retrieval baselines such as HyDE and Graph-RAG, while abstaining on 5.4% of questions.
 
-- 📄 Paper: `paper.md`
+- 📄 Paper: https://arxiv.org/abs/2608.13706
 - 🤗 Dataset: https://huggingface.co/datasets/Fatema142/BB-FinQA-X
 
 ![CLAIR-Fin workflow](diagrams/CLAIR-Fin_Workflow.png)
@@ -231,11 +231,16 @@ server/          FastAPI app
 ## Citation
 
 ```bibtex
-@misc{clairfin,
-  title  = {CLAIR-Fin: An Adversarial Multi-Agent Framework for Claim-Level Verification
-            and Adaptive Debate in Cross-Modal Financial QA},
-  author = {Faria, Fatema Tuj Johora and others},
-  year   = {2026}
+@misc{faria2026clairfinadversarialmultiagentframework,
+  title         = {CLAIR-Fin: An Adversarial Multi-Agent Framework for Claim-Level
+                   Verification and Adaptive Debate in Cross-Modal Financial QA},
+  author        = {Fatema Tuj Johora Faria and Mukaffi Bin Moin and Jubayer Al Mahmud
+                   and M. F. Mridha and Md. Alam Hossain},
+  year          = {2026},
+  eprint        = {2608.13706},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2608.13706}
 }
 ```
 
