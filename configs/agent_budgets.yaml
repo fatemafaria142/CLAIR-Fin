@@ -1,0 +1,49 @@
+# Per-agent/stage runtime budgets (debate rounds, revision cycles, retrieval top-k, token caps).
+orchestrator:
+  fast_path_agreement_threshold: 0.75
+  max_debate_rounds_per_claim: 2
+  max_revision_cycles_per_claim: 1
+  max_claims_per_question: 12
+  max_output_tokens: 1500
+
+extraction:
+  narrative:
+    retrieval_top_k: 8
+    max_output_tokens: 800
+  tabular:
+    max_tables_per_claim: 4
+    max_output_tokens: 600
+  visual:
+    max_figures_per_claim: 3
+    max_output_tokens: 500
+
+debate:
+  affirmative:
+    max_output_tokens: 700
+  adversarial:
+    max_output_tokens: 700
+    attack_categories:
+      - numeric
+      - scope
+      - fy_temporal
+      - causal_overclaim
+      - citation_gap
+      - visual_over_precision
+
+judge_auditor:
+  entailment_pass_threshold: 0.5
+  block_release_on_entailment_fail: true
+  max_output_tokens: 400
+
+entailment:
+  max_output_tokens: 300
+
+custody:
+  grounding_entailment_threshold: 0.5
+  max_repair_attempts: 1
+
+synthesizer:
+  max_output_tokens: 900
+
+run:
+  max_total_llm_calls_per_question: 40
