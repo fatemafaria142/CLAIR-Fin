@@ -4,7 +4,7 @@ CLAIR-Fin is a nine-agent framework for faithful question answering over long, m
 financial documents, where the same fact may appear as prose, a table, and a chart that do not
 always agree. Each question is decomposed into atomic, typed **claims** held in a *Financial
 Claim Ledger*; every claim is resolved through modality-aware evidence weighting, hand-off
-grounding checks, adaptive adversarial debate, and a terminal entailment audit, and the system
+grounding checks, adaptive adversarial debate, and a terminal entailment audit, and the framework
 abstains when evidence is insufficient rather than forcing an unsupported answer.
 
 On **BB-FinQA-X** (500 cross-modal questions from the Bangladesh Bank Annual Report), CLAIR-Fin
