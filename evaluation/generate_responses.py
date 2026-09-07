@@ -6,7 +6,13 @@ import logging
 from pathlib import Path
 from clairfin.graph.run import run_question
 from clairfin.utils.logging_setup import configure_logging
-from evaluation.gold_data import list_available_chapters, load_chapter_questions
+from evaluation.gold_data import (
+    GoldQuestion,
+    hf_chapters,
+    list_available_chapters,
+    load_chapter_questions,
+    load_hf_questions,
+)
 from evaluation.rag_utils import retrieve_contexts
 
 logger = logging.getLogger(__name__)
@@ -14,13 +20,21 @@ logger = logging.getLogger(__name__)
 EVALUATED_OUTPUT_DIR = Path(__file__).parent / "evaluated_output"
 
 
-def generate_chapter(chapter: str, *, k: int, output_suffix: str | None = None) -> Path:
+def generate_chapter(
+    chapter: str,
+    *,
+    k: int,
+    output_suffix: str | None = None,
+    questions: list[GoldQuestion] | None = None,
+) -> Path:
     """`output_suffix`, if given, is appended to the saved filename (`chapter_1_hyde.json` instead
     of `chapter_1.json`) without changing which gold question set is loaded — used by the
     retrieval-ablation experiments (`ablation-study/retrieval-ablation/*/run.py`) to run the same
     chapter's questions through a swapped-out retriever without overwriting the baseline's saved
-    output."""
-    questions = load_chapter_questions(chapter)
+    output. `questions`, if given, is used as-is (e.g. loaded from Hugging Face) instead of reading
+    a local `evaluation/questions/*.json` file; `chapter` is then only the output filename stem."""
+    if questions is None:
+        questions = load_chapter_questions(chapter)
     logger.info("Generating responses for %s (%d questions)", questions[0].chapter if questions else chapter, len(questions))
 
     rows = []
@@ -65,18 +79,29 @@ def generate_chapter(chapter: str, *, k: int, output_suffix: str | None = None) 
 
 def main() -> None:
     configure_logging("eval_generate")
-    parser = argparse.ArgumentParser(description="Run a chapter's gold questions through the live pipeline")
-    parser.add_argument("--chapter", type=int, default=None, help="Chapter number (1, 2, 3, ...)")
-    parser.add_argument("--all", action="store_true", help="Generate for every chapter with a questions/chapter_N.json file")
+    parser = argparse.ArgumentParser(description="Run BB-FinQA-X gold questions through the live pipeline")
+    parser.add_argument("--chapter", type=int, default=None, help="Chapter number (1-9); omit with --hf to run the whole dataset")
+    parser.add_argument("--all", action="store_true", help="Run every chapter, one output file each")
+    parser.add_argument("--hf", action="store_true", help="Load gold questions from Hugging Face (Fatema142/BB-FinQA-X) instead of local evaluation/questions/*.json")
     parser.add_argument("--k", type=int, default=8, help="Retrieval top-k to save per question (default 8)")
     args = parser.parse_args()
 
+    if args.hf:
+        if args.all:
+            for chapter in hf_chapters():
+                generate_chapter(f"chapter_{chapter}", k=args.k, questions=load_hf_questions(chapter))
+        elif args.chapter is not None:
+            generate_chapter(f"chapter_{args.chapter}", k=args.k, questions=load_hf_questions(args.chapter))
+        else:
+            generate_chapter("bbfinqax", k=args.k, questions=load_hf_questions())
+        return
+
     if not args.all and args.chapter is None:
-        parser.error("pass --chapter N or --all")
+        parser.error("pass --chapter N, --all, or --hf")
 
     chapters = list_available_chapters() if args.all else [str(args.chapter)]
     if not chapters:
-        parser.error("no evaluation/questions/chapter_*.json files found — run `python -m evaluation.gold_data` first")
+        parser.error("no evaluation/questions/chapter_*.json files found — run `python -m evaluation.gold_data` or pass --hf")
 
     for chapter in chapters:
         generate_chapter(chapter, k=args.k)
