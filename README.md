@@ -140,7 +140,9 @@ modality in ~52% of contested decisions; chart-dependent evidence and synthesis-
 
 ---
 
-## Installation
+## Getting started
+
+### 1. Install
 
 Requires Python ≥ 3.12 and an OpenAI API key.
 
@@ -150,48 +152,58 @@ cd CLAIR-Fin
 pip install -r requirements.txt          # or: uv sync
 ```
 
-Create a `.env` file in the project root with: `OPENAI_API_KEY` (required),
-`OPENAI_MODEL` (default `gpt-4o-mini`), `OPENAI_VISION_MODEL`,
-`EMBEDDING_MODEL` (default `text-embedding-3-large`).
+### 2. Configure
 
-## Usage
+Create a `.env` file in the project root:
+
+```env
+OPENAI_API_KEY=sk-...                    # required
+OPENAI_MODEL=gpt-4o                      # chat backbone for all agents
+OPENAI_VISION_MODEL=gpt-4o               # page table/chart extraction
+EMBEDDING_MODEL=text-embedding-3-large
+```
+
+### 3. Ingest documents
+
+Drop one or more source PDFs into `data/`, then build the vector store. Ingestion extracts
+text, tables (3× with an agreement check), and chart descriptions per page, chunks them, and
+upserts everything into a local Milvus Lite store. Run once per corpus.
 
 ```bash
-# 1. Ingest source PDFs — drop them in data/ first
+mkdir -p data && cp /path/to/report.pdf data/
 python -m clairfin.ingestion.ingest
+```
 
-# 2. Ask a single question
+### 4. Ask a question
+
+```bash
 python -m clairfin.graph.run "What was the point-to-point CPI inflation rate in FY2024?"
-
-# 3. Serve the pipeline as an API  (POST /api/query)
-uvicorn server.main:app --reload
-
-# 4. Reproduce evaluation for a chapter
-python -m evaluation.generate_responses --chapter 3
-python -m evaluation.run_rag_metrics --chapter 3        # Table 1: RAGAS + ranking metrics
-python -m evaluation.run_clairfin_metrics --chapter 3   # Table 2: framework-specific metrics
 ```
 
-Each run writes the full audit trail — ledger graph, custody log, Authority Docket, and a
-human-readable answer report — to `results/<run_id>/`.
+The pipeline decomposes the question into claims, retrieves and reconciles cross-modal
+evidence, debates contested claims, audits every claim, and prints the cited answer (or
+abstains). The full audit trail — ledger graph, custody log, Authority Docket, and a
+human-readable answer report — is written to `results/<run_id>/`.
 
-## Repository layout
+### 5. (Optional) Serve as an API
 
+```bash
+uvicorn server.main:app --reload         # POST /api/query  {"question": "..."}
 ```
-clairfin/
-  agents/        9 agents (planner, 3 evidence, guardian, 2 counsel, custody, judge, synthesizer)
-  graph/         LangGraph state machine (build.py) and run entry point (run.py)
-  ingestion/     PDF → text/table/chart extraction, chunking, Milvus upsert
-  retrieval/     modality-filtered dense + lexical retriever
-  ledger/        ClaimLedger evidence graph with JSON persistence
-  schemas/       Pydantic models (claims, evidence, AEA, ledger, state)
-  tools/         calculator, entailment, custody, AEA scorer, HRI, authority docket
-configs/         settings.py + aea_weights.yaml, agent_budgets.yaml, pricing.yaml
-prompts/         agent and tool prompt templates
-evaluation/      gold data loading, response generation, Table 1 / Table 2 scoring
-ablation-study/  HyDE, Hierarchical, and Graph-RAG retrieval baselines
-server/          FastAPI app
+
+### 6. (Optional) Reproduce the evaluation
+
+Gold questions live in `evaluation/questions/chapter_*.json` (regenerate from
+`docs/questions.md` with `python -m evaluation.gold_data`). For a chapter:
+
+```bash
+python -m evaluation.generate_responses --chapter 3        # run pipeline, save responses + contexts
+python -m evaluation.run_rag_metrics --chapter 3           # Table 1: RAGAS + ranking metrics
+python -m evaluation.run_clairfin_metrics --chapter 3      # Table 2: faithfulness rate, coverage, AEA impact
 ```
+
+Retrieval-strategy baselines (HyDE, Hierarchical, Graph-RAG) live under `ablation-study/`, each
+with its own `run_and_score.py --chapters 1 2 3`.
 
 ## Citation
 
