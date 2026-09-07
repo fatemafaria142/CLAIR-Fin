@@ -112,7 +112,7 @@ rather than the chart, as prescribed by Asymmetric Evidence Authority.
 
 **Retrieval and generation metrics — CLAIR-Fin vs. ablations and retrieval baselines**
 
-| Configuration | Faith. ↑ | Ans. Rel. ↑ | Ctx. Prec. ↑ | Ctx. Recall ↑ |
+| Configuration | Faithfulness ↑ | Answer Relevancy ↑ | Context Precision ↑ | Context Recall ↑ |
 |---|--:|--:|--:|--:|
 | **CLAIR-Fin** | **0.889** | **0.696** | **0.816** | **0.897** |
 | w/o Terminal Audit | 0.845 | 0.687 | 0.803 | 0.886 |
@@ -130,7 +130,7 @@ Debate utilization: **0.646**. AEA impact rate: **0.515**.
 
 **Metrics by presentation format** (sample-weighted)
 
-| Format | n | Faith. ↑ | Ans. Rel. ↑ | Ctx. Prec. ↑ | Ctx. Recall ↑ |
+| Format | n | Faithfulness ↑ | Answer Relevancy ↑ | Context Precision ↑ | Context Recall ↑ |
 |---|--:|--:|--:|--:|--:|
 | Text Only | 100 | 0.870 | 0.675 | 0.795 | 0.878 |
 | Table Only | 100 | 0.900 | 0.705 | 0.830 | 0.912 |
@@ -141,7 +141,7 @@ Debate utilization: **0.646**. AEA impact rate: **0.515**.
 
 **Metrics by query type** (sample-weighted)
 
-| Query Type | n | Faith. ↑ | Ans. Rel. ↑ | Ctx. Prec. ↑ | Ctx. Recall ↑ |
+| Query Type | n | Faithfulness ↑ | Answer Relevancy ↑ | Context Precision ↑ | Context Recall ↑ |
 |---|--:|--:|--:|--:|--:|
 | Fact Extraction | 150 | 0.920 | 0.735 | 0.855 | 0.928 |
 | Comparison | 135 | 0.900 | 0.710 | 0.825 | 0.908 |
